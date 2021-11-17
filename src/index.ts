@@ -2,9 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 
 import db from "./db";
-
 import error from "./middlewares/error";
-import { register } from "./controllers/user";
+import router from "./router";
 
 const PORT = process.env.PORT || 3000;
 
@@ -12,9 +11,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => res.send("Hello world"));
-
-app.post("/user", register);
+app.use(router);
 
 app.use(error);
 
