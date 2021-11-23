@@ -3,7 +3,7 @@ services:
   api-server:
     image: api-server
     ports:
-      - "3000:3000"
+      - "3030:3000"
     networks:
       - finance-app
     depends_on:
