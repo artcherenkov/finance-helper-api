@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/user";
 import BadRequestError from "../errors/bad-request";
 import ConflictError from "../errors/conflict";
+import NotFoundError from "../errors/not-found";
 
 const { JWT_SECRET = "super-strong-secret" } = process.env;
 
@@ -57,4 +58,31 @@ export const login = (
         .send({ message: "Вы успешно вошли в свой аккаунт." });
     })
     .catch(next);
+};
+
+export const getUserInfo = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  const userId = res.locals.user._id;
+
+  User.findById(userId)
+    .then((u) => {
+      if (!u) {
+        throw new NotFoundError("Пользователь по указанному _id не найден");
+      }
+      res.send({ data: u });
+    })
+    .catch((err) => {
+      if (err.name === "CastError") {
+        next(
+          new BadRequestError(
+            "При получении данных о пользователе передан некорректный _id"
+          )
+        );
+      } else {
+        next(err);
+      }
+    });
 };
