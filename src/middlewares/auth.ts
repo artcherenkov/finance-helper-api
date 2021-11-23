@@ -14,24 +14,21 @@ export default (
   res: express.Response,
   next: express.NextFunction
 ) => {
-  const { jwt: token } = req.cookies;
+  const authHeader = req.headers.authorization;
+  let token = authHeader?.split("Bearer ")[1];
+
+  if (!token) {
+    return handleAuthError(next);
+  }
+
+  let payload;
 
   try {
-    if (!token) {
-      return handleAuthError(next);
-    }
-
-    let payload;
-
-    try {
-      payload = jwt.verify(token, JWT_SECRET);
-    } catch (err) {
-      return handleAuthError(next);
-    }
-
-    res.locals.user = payload;
-    return next();
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    console.log(err);
+    return handleAuthError(next);
   }
+
+  res.locals.user = payload;
+  return next();
 };

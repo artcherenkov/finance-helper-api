@@ -49,13 +49,7 @@ export const login = (
         expiresIn: "7d",
       });
 
-      res
-        .cookie("jwt", token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-          sameSite: true,
-        })
-        .send({ message: "Вы успешно вошли в свой аккаунт." });
+      res.send({ token, message: "Вы успешно вошли в свой аккаунт." });
     })
     .catch(next);
 };
