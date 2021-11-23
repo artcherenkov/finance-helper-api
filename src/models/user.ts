@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import bcrypt from "bcryptjs";
 
 import UnauthorizedError from "../errors/unauthorized";
@@ -8,7 +8,14 @@ export interface IUser {
   password: string;
 }
 
-const userSchema = new mongoose.Schema<IUser>({
+interface UserModel extends Model<IUser> {
+  findUserByCredentials(
+    email: string,
+    password: string
+  ): Promise<mongoose.Document<IUser>>;
+}
+
+const userSchema = new mongoose.Schema<IUser, UserModel>({
   email: {
     type: String,
     required: true,
@@ -37,18 +44,20 @@ userSchema.pre("save", function (next) {
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select("+password")
-    .then((u: IUser) => {
+    .then((u: mongoose.Document<IUser> | null) => {
       if (!u) {
         throw new UnauthorizedError("Неверный логин или пароль.");
       }
 
-      return bcrypt.compare(password, u.password).then((matched) => {
+      const user = u.toObject() as IUser;
+
+      return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
           throw new UnauthorizedError("Неверный логин или пароль.");
         }
-        return u;
+        return user;
       });
     });
 };
 
-export default mongoose.model("user", userSchema);
+export default mongoose.model<IUser, UserModel>("user", userSchema);

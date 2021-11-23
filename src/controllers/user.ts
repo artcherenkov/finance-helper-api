@@ -1,9 +1,12 @@
 import mongoose from "mongoose";
 import express from "express";
+import jwt from "jsonwebtoken";
 
 import User, { IUser } from "../models/user";
 import BadRequestError from "../errors/bad-request";
 import ConflictError from "../errors/conflict";
+
+const { JWT_SECRET = "super-strong-secret" } = process.env;
 
 export const register = (
   req: express.Request,
@@ -31,4 +34,27 @@ export const register = (
         );
       }
     });
+};
+
+export const login = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) => {
+  const { email, password } = req.body;
+  User.findUserByCredentials(email, password)
+    .then((u: mongoose.Document<IUser>) => {
+      const token = jwt.sign({ _id: u._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      res
+        .cookie("jwt", token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .send({ message: "Вы успешно вошли в свой аккаунт." });
+    })
+    .catch(next);
 };
