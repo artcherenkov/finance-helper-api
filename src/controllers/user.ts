@@ -60,6 +60,11 @@ export const login = (
     .catch(next);
 };
 
+export const logout = (req: express.Request, res: express.Response) => {
+  res.clearCookie("jwt");
+  res.status(201).send({ message: "Вы успешно вышли из своего аккаунта." });
+};
+
 export const getUserInfo = (
   req: express.Request,
   res: express.Response,

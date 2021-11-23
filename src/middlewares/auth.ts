@@ -1,7 +1,7 @@
 import express from "express";
+import jwt from "jsonwebtoken";
 
-const jwt = require("jsonwebtoken");
-const UnauthorizedError = require("../errors/unauthorized");
+import UnauthorizedError from "../errors/unauthorized";
 
 const { JWT_SECRET = "super-strong-secret" } = process.env;
 
@@ -16,18 +16,22 @@ export default (
 ) => {
   const { jwt: token } = req.cookies;
 
-  if (!token) {
-    return handleAuthError(next);
-  }
-
-  let payload;
-
   try {
-    payload = jwt.verify(token, JWT_SECRET);
-  } catch (err) {
-    return handleAuthError(next);
-  }
+    if (!token) {
+      return handleAuthError(next);
+    }
 
-  res.locals.user = payload;
-  return next();
+    let payload;
+
+    try {
+      payload = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return handleAuthError(next);
+    }
+
+    res.locals.user = payload;
+    return next();
+  } catch (err) {
+    console.log(err);
+  }
 };

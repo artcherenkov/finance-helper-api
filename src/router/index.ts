@@ -1,14 +1,17 @@
 import { Router } from "express";
-import { register, login, getUserInfo } from "../controllers/user";
+
 import auth from "../middlewares/auth";
+import NotFoundError from "../errors/not-found";
+import authRouter from "./auth";
+import userRouter from "./user";
 
 const router = Router();
 
-router.get("/", (req, res) => res.send("Hello world"));
+router.use("/user", auth, userRouter);
+router.use("/", authRouter);
 
-router.post("/register", register);
-router.post("/login", login);
-
-router.get("/user", auth, getUserInfo);
+router.use(auth, () => {
+  throw new NotFoundError("Ресурс не найден");
+});
 
 export default router;
