@@ -1,7 +1,6 @@
 version: "3"
 services:
   api-server:
-    container_name: api
     image: api-server
     ports:
       - "3030:3000"
@@ -10,7 +9,6 @@ services:
     depends_on:
       - mongo
   mongo:
-    container_name: db
     image: mongo:3.6.19-xenial
     ports:
       - "27172:27017"

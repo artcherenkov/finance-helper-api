@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const DB_URL = process.env.DB_URL || "mongodb://mongo:27172/finance-helper";
+const DB_URL = process.env.DB_URL || "mongodb://mongo:27017/finance-helper";
 
 mongoose
   .connect(DB_URL, {
