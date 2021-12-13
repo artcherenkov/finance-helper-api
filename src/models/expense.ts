@@ -9,24 +9,27 @@ export interface IExpense {
 
 interface ExpenseModel extends Model<IExpense> {}
 
-const expenseSchema = new mongoose.Schema<IExpense, ExpenseModel>({
-  type: {
-    type: String,
-    required: true,
+const expenseSchema = new mongoose.Schema<IExpense, ExpenseModel>(
+  {
+    type: {
+      type: String,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    owner: {
+      type: mongoose.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
   },
-  title: {
-    type: String,
-    required: true,
-  },
-  amount: {
-    type: Number,
-    required: true,
-  },
-  owner: {
-    type: mongoose.Types.ObjectId,
-    ref: "user",
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
 export default mongoose.model<IExpense, ExpenseModel>("expense", expenseSchema);
